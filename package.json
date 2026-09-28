@@ -1,0 +1,22 @@
+{
+  "name": "taskdo",
+  "version": "1.0.0",
+  "description": "Programa de anotações de tarefas",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felipesantosf1/DoList.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/felipesantosf1/DoList/issues"
+  },
+  "homepage": "https://github.com/felipesantosf1/DoList#readme",
+  "devDependencies": {
+    "electron": "^44.4.5"
+  }
+}
