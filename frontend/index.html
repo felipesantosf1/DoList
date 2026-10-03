@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle de Diretrizes</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- Link para o seu CSS -->
+</head>
+<body>
+
+    <div class="hud-container">
+        <header class="hud-header">
+            <h1>SYS.TASKS // ROOT</h1>
+            <span class="status">SISTEMA ONLINE</span>
+        </header>
+
+        <div class="filter-dropdown" id="filterDropdown">
+            <button class="filter-toggle" onclick="toggleFilterMenu()" id="filterToggleBtn">
+                [Filtro: Todos] <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="filter-menu" id="filterMenu">
+                <button onclick="setFilter('all', 'Todos')">[Todos]</button>
+                <button onclick="setFilter('active', 'Pendentes')">[Pendentes]</button>
+                <button onclick="setFilter('completed', 'Concluídos')">[Concluídos]</button>
+                <button onclick="setFilter('p1', 'P1: Alta')">[P1: Alta]</button>
+                <button onclick="setFilter('p2', 'P2: Média')">[P2: Média]</button>
+                <button onclick="setFilter('p3', 'P3: Baixa')">[P3: Baixa]</button>
+                <button onclick="setFilter('p4', 'P4: Diária')">[P4: Diária]</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="prompt">></span>
+            <button id="prioBadge" class="prio-badge" onclick="cyclePriority()" title="Clique para alterar a prioridade">
+                [P2: Média]
+            </button>
+            <input type="text" id="taskInput" placeholder="Inserir nova diretriz...">
+            <button class="add-task" onclick="addTask()"> <i class="fa-solid fa-plus"></i> </button>
+        </div>
+
+        <div class="list-wrapper">
+            <ul class="task-list" id="taskList">
+                <!-- As tarefas serão carregadas aqui via JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="code.js"></script> <!-- Link para o seu JS -->
+</body>
+</html>
