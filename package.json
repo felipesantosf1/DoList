@@ -1,5 +1,5 @@
 {
-  "name": "taskdo",
+  "name": "RootTask",
   "version": "1.0.0",
   "description": "Programa de anotações de tarefas",
   "main": "electron/main.js",
