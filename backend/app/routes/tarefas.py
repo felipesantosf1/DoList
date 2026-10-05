@@ -10,11 +10,11 @@ router = APIRouter(prefix="/tarefas", tags=["Tarefas"])
 # PEGA INFORMAÇÕES
 @router.get("/", response_model=list[Tarefa])
 def listar_tarefas(dados=Depends(get_db)):
-
     cursor = dados.cursor(cursor_factory=RealDictCursor)
-
+    
+    # O SELECT * já vai puxar a nova coluna priority automaticamente
     cursor.execute(
-        "SELECT * FROM tarefas ORDER BY id;"
+        "SELECT * FROM tarefas ORDER BY id DESC;"
     ) 
     
     tarefas = cursor.fetchall()
@@ -22,27 +22,43 @@ def listar_tarefas(dados=Depends(get_db)):
 
     return tarefas
 
-# CRIA NOVOS TAREFAS
+# RESET DAS TAREFAS DIÁRIAS
+@router.post("/reset-diarias")
+def resetar_tarefas_diarias(dados=Depends(get_db)):
+
+    cursor = dados.cursor()
+
+    cursor.execute(
+        """
+        UPDATE tarefas
+        SET status = FALSE
+        WHERE priority = 4
+        AND status = TRUE;
+        """
+    )
+
+    dados.commit()
+
+    cursor.close()
+
+    return {"mensagem": "Tarefas diárias resetadas com sucesso!"}
+
+# CRIA NOVAS TAREFAS
 @router.post("/", response_model=Tarefa)
 def criar_tarefa(tarefa: TarefaCriacao, dados=Depends(get_db)):
-
     cursor = dados.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute(
         """
-        INSERT INTO tarefas (tarefa) 
-        VALUES (%s) 
-        RETURNING id, tarefa, status;
+        INSERT INTO tarefas (tarefa, priority) 
+        VALUES (%s, %s) 
+        RETURNING id, tarefa, status, priority;
         """, 
-        [tarefa.tarefa]
+        [tarefa.tarefa, tarefa.priority]
     ) 
 
-    # fetchone() captura a única linha que o RETURNING devolveu
     nova_tarefa = cursor.fetchone()
-
-    # Confirma e salva a inserção de fato no banco de dados
     dados.commit()
-
     cursor.close()
 
     return nova_tarefa
@@ -50,10 +66,8 @@ def criar_tarefa(tarefa: TarefaCriacao, dados=Depends(get_db)):
 # DELETA A TAREFA
 @router.delete("/{id}")
 def excluir_tarefa(id: int, dados=Depends(get_db)):
-
     cursor = dados.cursor(cursor_factory=RealDictCursor)
 
-    # deleta a tarefa onde o ID da tarefa seja igual ao tarefa_id que veio na URL
     cursor.execute(
         "DELETE FROM tarefas WHERE id = %s RETURNING id;",
         [id]
@@ -68,40 +82,37 @@ def excluir_tarefa(id: int, dados=Depends(get_db)):
             detail="Tarefa não encontrada."
         )
 
-    # 3. Se a tarefa existia e foi deletada, confirmamos a ação no banco
     dados.commit()
     cursor.close()
 
     return {"mensagem": "Tarefa excluída com sucesso!"}
 
-
 # ATUALIZAÇÃO DE TAREFA
 @router.put("/{id}", response_model=Tarefa)
 def atualizar_tarefa(id: int, tarefa_atualizada: TarefaAtualizacao, dados=Depends(get_db)):
-    
     cursor = dados.cursor(cursor_factory=RealDictCursor)
 
-    # O comando UPDATE altera apenas a linha onde o id bate com a URL
+    # COALESCE garante que valores não enviados (None/NULL) não sobrescrevam os dados existentes
     cursor.execute(
         """
         UPDATE tarefas
-        SET tarefa = %s, status = %s
+        SET tarefa = COALESCE(%s, tarefa), 
+        status = COALESCE(%s, status), 
+        priority = COALESCE(%s, priority)
         WHERE id = %s
-        RETURNING id, tarefa, status;
+        RETURNING id, tarefa, status, priority;
         """,
-        # Passamos os três valores correspondentes aos três %s do SQL (incluindo o id no final)
-        [tarefa_atualizada.tarefa, tarefa_atualizada.status, id]
+        [tarefa_atualizada.tarefa, tarefa_atualizada.status, tarefa_atualizada.priority, id]
     )
 
     tarefa_editada = cursor.fetchone()
 
-    # Se o banco não devolveu nada, é porque o id não existe
     if not tarefa_editada:
-            cursor.close()
-            raise HTTPException(
-                status_code=404,
-                detail="Tarefa não encontrada."
-            )
+        cursor.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Tarefa não encontrada."
+        )
 
     dados.commit()
     cursor.close()
