@@ -4,7 +4,8 @@
   "description": "Programa de anotações de tarefas",
   "main": "electron/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,27 @@
     "url": "https://github.com/felipesantosf1/DoList/issues"
   },
   "homepage": "https://github.com/felipesantosf1/DoList#readme",
+  "build": {
+    "appId": "com.roottask.app",
+    "productName": "RootTask",
+    "icon": "frontend/img/logo_V2.ico",
+    "files": [
+      "electron/**/*",
+      "frontend/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/dist/run_api",
+        "to": "backend/dist/run_api"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "frontend/img/logo_V2.ico"
+    }
+  },
   "devDependencies": {
-    "electron": "^44.4.5"
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
   }
 }

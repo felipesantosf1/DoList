@@ -1,7 +1,17 @@
+# Dependências do Node.js e Python
+node_modules/
 backend/.venv/
 __pycache__/
 *.pyc
+
+# Variáveis de ambiente
 .env
-node_modules/
+backend/.env
+
+# Pastas de build do PyInstaller e Electron
+backend/build/
+backend/dist/
 dist/
-text.txt
+
+# Arquivos de especificação do PyInstaller
+*.spec 

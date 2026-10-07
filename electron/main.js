@@ -1,5 +1,47 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
+const { spawn } = require("child_process");
+
+// Variável para armazenar o processo do servidor Python
+let pyProc = null;
+
+// Função para iniciar a API Python em segundo plano
+function iniciarBackendPython() {
+    const isPackaged = app.isPackaged;
+
+    // Se estiver empacotado, busca a API nos recursos do instalador.
+    // Se estiver em desenvolvimento, busca a pasta dist gerada pelo PyInstaller.
+    const apiPath = isPackaged
+        ? path.join(process.resourcesPath, "backend", "dist", "run_api", "run_api.exe")
+        : path.join(__dirname, "..", "backend", "dist", "run_api", "run_api.exe");
+
+    console.log("Iniciando API Python em:", apiPath);
+
+    // Executa o .exe do Python
+    pyProc = spawn(apiPath);
+
+    // Registra logs do Python no console do Electron (útil para depuração)
+    pyProc.stdout.on("data", (data) => {
+        console.log(`[Python Log]: ${data}`);
+    });
+
+    pyProc.stderr.on("data", (data) => {
+        console.error(`[Python Erro]: ${data}`);
+    });
+
+    pyProc.on("error", (err) => {
+        console.error("Falha ao iniciar a API Python:", err);
+    });
+}
+
+// Função para fechar a API Python quando o app for encerrado
+function encerrarBackendPython() {
+    if (pyProc !== null) {
+        console.log("Encerrando o servidor Python...");
+        pyProc.kill();
+        pyProc = null;
+    }
+}
 
 function criarJanela() {
     const janela = new BrowserWindow({
@@ -7,8 +49,8 @@ function criarJanela() {
         height: 600,
         minWidth: 500,
         minHeight: 500,
-        alwaysOnTop: true,       // Mantém a janela sempre visível enquanto você programa ou projeta
         autoHideMenuBar: true,   // Esconde a barra nativa do Windows (Arquivo, Editar, etc) para ganhar espaço
+        icon: path.join(__dirname, "..", "frontend", "img", "logo_V2.ico"),
         webPreferences: {
             contextIsolation: true
         }
@@ -18,6 +60,7 @@ function criarJanela() {
 }
 
 app.whenReady().then(() => {
+    iniciarBackendPython(); // Inicia a API Python antes de abrir a janela
     criarJanela();
 
     app.on("activate", () => {
@@ -31,4 +74,9 @@ app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
         app.quit();
     }
+});
+
+// Garante que a API Python é destruída assim que o Electron fechar
+app.on("will-quit", () => {
+    encerrarBackendPython();
 });
