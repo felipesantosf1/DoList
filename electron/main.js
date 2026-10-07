@@ -2,25 +2,29 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { spawn } = require("child_process");
 
-// Variável para armazenar o processo do servidor Python
 let pyProc = null;
 
-// Função para iniciar a API Python em segundo plano
 function iniciarBackendPython() {
+
     const isPackaged = app.isPackaged;
 
-    // Se estiver empacotado, busca a API nos recursos do instalador.
-    // Se estiver em desenvolvimento, busca a pasta dist gerada pelo PyInstaller.
     const apiPath = isPackaged
-        ? path.join(process.resourcesPath, "backend", "dist", "run_api", "run_api.exe")
-        : path.join(__dirname, "..", "backend", "dist", "run_api", "run_api.exe");
+        ? path.join(process.resourcesPath, "backend", "dist", "run_api.exe")
+        : path.join(__dirname, "..", "backend", "dist", "run_api.exe");
 
     console.log("Iniciando API Python em:", apiPath);
 
-    // Executa o .exe do Python
-    pyProc = spawn(apiPath);
+    // Define a pasta de trabalho do Python
+    const backendDir = isPackaged
+        ? path.join(process.resourcesPath, "backend")
+        : path.join(__dirname, "..", "backend");
 
-    // Registra logs do Python no console do Electron (útil para depuração)
+    // Executa o .exe do Python
+    pyProc = spawn(apiPath, {
+        cwd: backendDir
+    });
+
+    // Registra logs do Python no console do Electron
     pyProc.stdout.on("data", (data) => {
         console.log(`[Python Log]: ${data}`);
     });

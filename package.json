@@ -27,8 +27,8 @@
     ],
     "extraResources": [
       {
-        "from": "backend/dist/run_api",
-        "to": "backend/dist/run_api"
+        "from": "backend/dist/run_api.exe",
+        "to": "backend/dist/run_api.exe"
       }
     ],
     "win": {

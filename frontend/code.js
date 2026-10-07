@@ -3,7 +3,7 @@ const taskList = document.getElementById('taskList');
 const prioBadge = document.getElementById('prioBadge');
 
 // URL da sua API FastAPI (ajuste a porta se o seu backend estiver noutra)
-const API_URL = 'http://localhost:8000/tarefas';
+const API_URL = 'http://127.0.0.1:8000/tarefas';
 
 // Configuração de Prioridades com 'short' para a tag dentro da tarefa
 const priorities = [
@@ -377,13 +377,29 @@ function scheduleMidnightReset() {
 
 // INICIALIZAÇÃO
 window.onload = async () => {
+    const inicio = performance.now();
 
     updatePrioBadge();
 
     await checkDailyReset();
 
+    console.log(
+        `checkDailyReset: ${(performance.now() - inicio).toFixed(0)} ms`
+    );
+
+    const inicioLoad = performance.now();
+
     await loadFromDB();
 
-    scheduleMidnightReset();
+    console.log(
+        `loadFromDB: ${(performance.now() - inicioLoad).toFixed(0)} ms`
+    );
 
+    console.log(
+        `Inicialização total: ${(performance.now() - inicio).toFixed(0)} ms`
+    );
+
+    scheduleMidnightReset();
 };
+
+
