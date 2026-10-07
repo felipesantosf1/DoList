@@ -1,6 +1,6 @@
 # run_api.py
 import uvicorn
-from app.main import app # Importa o 'app' que você configurou no main.py
+from app.main import app 
 
 if __name__ == "__main__":
     # Roda o servidor
