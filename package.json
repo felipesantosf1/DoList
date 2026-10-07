@@ -21,19 +21,31 @@
     "appId": "com.roottask.app",
     "productName": "RootTask",
     "icon": "frontend/img/logo_V2.ico",
+
     "files": [
       "electron/**/*",
       "frontend/**/*"
     ],
+
     "extraResources": [
       {
         "from": "backend/dist/run_api.exe",
         "to": "backend/dist/run_api.exe"
       }
     ],
+
     "win": {
       "target": "nsis",
       "icon": "frontend/img/logo_V2.ico"
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RootTask",
+      "runAfterFinish": true
     }
   },
   "devDependencies": {
